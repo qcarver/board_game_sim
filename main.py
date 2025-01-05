@@ -1,12 +1,13 @@
 import random
 
 class Card:
-    def __init__(self, name, suit):
-        self.name = name
-        self.suit = suit
+    def __init__(self, name, text, cost):
+        self.name = name  # Name of the card
+        self.text = text  # Description of the card's effect
+        self.cost = cost  # Dictionary of resource and quantity (e.g., {Resource.POWER: 2, Resource.HEAT: 1}) (e.g., [[Resource.POWER, 2], [Resource.HEAT, 1]])
 
     def __str__(self):
-        return f"{self.name} of {self.suit}"
+        return f"{self.name}"
 
 from enum import Enum
 
@@ -47,10 +48,18 @@ class Player:
         self.payout = {resource: 0 for resource in Resource}  # Track the player's previous payout
 
 class CardDeck:
-    def __init__(self):
-        suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
-        names = ["Nine", "Jack", "Queen", "King", "Ten", "Ace"]
-        self.deck = [Card(name, suit) for name in names for suit in suits] * 2  # Pinochle deck has two of each card
+    def __init__(self, card_data):
+        """Initialize the CardDeck with card data from a CSV array."""
+        self.deck = []
+        for line in card_data:
+            parts = line.split(', ')
+            name = parts[0]
+            text = parts[1]
+            cost = {
+                Resource[parts[i].upper()]: int(parts[i + 1])
+                for i in range(2, len(parts), 2)
+            }
+            self.deck.append(Card(name, text, cost))
         random.shuffle(self.deck)
 
     def draw_card(self):
@@ -82,7 +91,11 @@ class Game:
             Player("CPU4", Trade.QUARRYMAN),
             Player("CPU5", Trade.TECHNICIAN),
         ]
-        self.card_deck = CardDeck()
+        self.card_deck = CardDeck([
+            "Power Boost, Increases power production, POWER, 2, ORDER, 1",
+            "Heat Shield, Reduces heat damage, HEAT, 3, EXPORTS, 1",
+            "Trade Expansion, Adds trade routes, IMPORTS, 2, INDEPENDENCE, 1, ORDER, 1"
+        ])
 
     def draw_card(self,player):
         response = input(f"{player.name} (draw card)? [Y]: ") or "Y"
