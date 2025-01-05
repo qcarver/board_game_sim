@@ -138,8 +138,7 @@ class Game:
                     elif phase == "Payout":
                         self.calculate_payout(player)
                 else:
-                    print(f"{player.name} skipped {phase}             if self.round == 1: 
-                player.name = input(f"What is {player.trade.name}'s name? [{player.name}]: ") or player.namephase.")
+                    print(f"{player.name} skipped {phase}")
 
 # Run the game
 game = Game()
