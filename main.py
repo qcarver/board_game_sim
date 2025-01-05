@@ -56,8 +56,12 @@ class CardDeck:
             name = parts[0]
             text = parts[1]
             cost = {
-                Resource[parts[i].upper()]: int(parts[i + 1])
-                for i in range(2, len(parts), 2)
+                "POWER": int(parts[2]),
+                "HEAT": int(parts[3]),
+                "INDEPENDENCE": int(parts[4]),
+                "ORDER": int(parts[5]),
+                "IMPORTS": int(parts[6]),
+                "EXPORTS": int(parts[7])
             }
             self.deck.append(Card(name, text, cost))
         random.shuffle(self.deck)
@@ -92,9 +96,24 @@ class Game:
             Player("CPU5", Trade.TECHNICIAN),
         ]
         self.card_deck = CardDeck([
-            "Power Boost, Increases power production, POWER, 2, ORDER, 1",
-            "Heat Shield, Reduces heat damage, HEAT, 3, EXPORTS, 1",
-            "Trade Expansion, Adds trade routes, IMPORTS, 2, INDEPENDENCE, 1, ORDER, 1"
+        "Stop Train, Everything that goes - stops, 0, 0, 2, 2, 1, 0, PyFxn, PyFxnParam", 
+        "Decrease Speed, Whoah Big Fella!, 0, 0, 1, 0, 1, 0, PyFxn, PyFxnParam", 
+        "Increase Speed, Increases power production, 2, 2, 1, 0, 1, 0, PyFxn, PyFxnParam", 
+        "Heat Shield, Reduces heat damage, 0, 3, 1, 0, 0, 1, PyFxn, PyFxnParam", 
+        "Increase Fe Yield, More efficient Iron Extraction from Ilmenite, 2, 0, 0, 1, 0, 1, PyFxn, PyFxnParam", 
+        "Sheet-Metal Production, Some like it flat, 1, 1, 1, 1, 0, 1, PyFxn, PyFxnParam", 
+        "Steel, The difference between Steel and Iron is a little bit of Carbon and a lot of know how!, 1, 1, 0, 1, 0, 1, PyFxn, PyFxnParam", 
+        "Increase Ti Yield, More efficient Titanium Extraction from Ilmenite, 2, 0, 0, 1, 0, 1, PyFxn, PyFxnParam", 
+        "Blockade, This is our hill.. these are our beans, 1, 0, 1, 0, 1, 0, PyFxn, PyFxnParam", 
+        "Party, Workers Gone Wild, 0, 0, 0, 2, 1, 1, PyFxn, PyFxnParam", 
+        "Bucket Buster, You can't shovel that, 1, 1, 1, 0, 1, 1, PyFxn, PyFxnParam", 
+        "Solar Flare, Increases power production, 3, 0, 1, 0, 0, 1, PyFxn, PyFxnParam", 
+        "Geothermal Vulcanism, Increases heat production, 3, 0, 1, 0, 0, 1, PyFxn, PyFxnParam", 
+        "Rubble, Soil so loose you can pick it up with your bare hands.. well almost, 0, 1, 1, 0, 0, 1, PyFxn, PyFxnParam", 
+        "Rocky Road, it's not just ice cream, 1, 0, 1, 0, 1, 0, PyFxn, PyFxnParam", 
+        "Boulder, Like a rock but much bigger, 1, 1, 1, 0, 1, 1, PyFxn, PyFxnParam", 
+        "Civil Service Day, Usually we aren't very civil, 0, 0, 0, 3, 0, 2, PyFxn, PyFxnParam", 
+        "Rail Damage, Railways on Mercury, 0, 1, 0, 1, 0, 1, PyFxn, PyFxnParam"
         ])
 
     def draw_card(self,player):
@@ -138,8 +157,9 @@ class Game:
 
         valid_input = False
         while not valid_input:
-            action_input = input("Choose an action (1, 2, ..., B, P): ").strip().upper()
-
+            action_input = input("Choose an action (1, 2, ..., B, P)[P]: ").strip().upper()
+            if not action_input:
+                action_input = "P"
             if action_input.startswith("B"):
                 print("Barter selected. Implement barter logic here.")
                 valid_input = True
