@@ -1,3 +1,8 @@
+# Mercury Rails Game: A text-based game of resource management and strategy on Mercury.
+# The author qcarver@gmail.com does NOT authorize the use of this code for ANYTHING 
+# it is the intellectual property of the Carver family and shouldn't be destributed. 
+# Even worse, it is a work in progress and not ready for ANYONE ANYWAY. Good Talk! 
+
 import random
 
 class Card:
@@ -56,12 +61,12 @@ class CardDeck:
             name = parts[0]
             text = parts[1]
             cost = {
-                "POWER": int(parts[2]),
-                "HEAT": int(parts[3]),
-                "INDEPENDENCE": int(parts[4]),
-                "ORDER": int(parts[5]),
-                "IMPORTS": int(parts[6]),
-                "EXPORTS": int(parts[7])
+                Resource.POWER: int(parts[2]),
+                Resource.HEAT: int(parts[3]),
+                Resource.INDEPENDENCE: int(parts[4]),
+                Resource.ORDER: int(parts[5]),
+                Resource.IMPORTS: int(parts[6]),
+                Resource.EXPORTS: int(parts[7])
             }
             self.deck.append(Card(name, text, cost))
         random.shuffle(self.deck)
@@ -85,6 +90,14 @@ TRADE_PAYOUT_MAP = {
     CarType.ENGINE: ["Power", "Imports", "Order"]
 }
 
+def has_resources(player, card):
+    return (player.resources[Resource.POWER] >=        card.cost[Resource.POWER]        and
+            player.resources[Resource.HEAT] >=         card.cost[Resource.HEAT]         and
+            player.resources[Resource.INDEPENDENCE] >= card.cost[Resource.INDEPENDENCE] and
+            player.resources[Resource.ORDER] >=        card.cost[Resource.ORDER]        and
+            player.resources[Resource.IMPORTS] >=      card.cost[Resource.IMPORTS]      and
+            player.resources[Resource.EXPORTS] >=      card.cost[Resource.EXPORTS]      )
+
 class Game:
     def __init__(self):
         self.round = 1  # Initialize the game round
@@ -95,6 +108,7 @@ class Game:
             Player("CPU4", Trade.QUARRYMAN),
             Player("CPU5", Trade.TECHNICIAN),
         ]
+        #name, text,            power, heat, independence, order, imports, exports,   fxn, param
         self.card_deck = CardDeck([
         "Stop Train, Everything that goes - stops, 0, 0, 2, 2, 1, 0, PyFxn, PyFxnParam", 
         "Decrease Speed, Whoah Big Fella!, 0, 0, 1, 0, 1, 0, PyFxn, PyFxnParam", 
@@ -151,7 +165,11 @@ class Game:
         """Handle the Action phase for a player."""
         print("Actions available:")
         for index, card in enumerate(player.cards, start=1):
-            print(f"{index}. {card}")
+            # Assuming you have a function `has_resources(player, card)` that checks if the player has the necessary resources
+            if has_resources(player, card):
+                print(f"{index}. {card}")
+            else:
+                print(f"\033[9m{index}. {card}\033[0m")
         print("B. Barter")
         print("P. Pass")
 
@@ -167,34 +185,38 @@ class Game:
                 print(f"{player.name} passes the action phase.")
                 valid_input = True
             else:
-                try:
-                    card_index = int(action_input) - 1
-                    if 0 <= card_index < len(player.cards):
-                        selected_card = player.cards[card_index]
-                        print(f"Playing card: {selected_card}")
+                self.play_selected_card(player, action_input)
+
+    def play_selected_card(self, player, action_input):
+        try:
+            card_index = int(action_input) - 1
+            if 0 <= card_index < len(player.cards):
+                selected_card = player.cards[card_index]
+                print(f"Playing card: {selected_card}")
                         # Implement card action logic here
-                        valid_input = True
-                    else:
-                        print("Invalid card selection.")
-                except ValueError:
-                    print("Invalid input. Please choose a valid action.")
+                valid_input = True
+            else:
+                print("Invalid card selection.")
+        except ValueError:
+            print("Invalid input. Please choose a valid action.")
 
     def run_game(self):
-        for player in self.players:
-            print(f"--- Round {self.round} ---")
-            if self.round == 1: 
-                player.name = input(f"What is {player.trade.name}'s name? [{player.name}]: ") or player.name
-            for phase in ["Draw", "Payout", "Action"]:
-                match phase:
-                    case "Draw":
-                        self.draw_card(player)
-                    case "Payout":
-                        self.calculate_payout(player)
-                    case "Action":
-                        self.action_phase(player)
-                        # Increment the round after the last player's Action phase
-                        if player == self.players[-1] :
-                            self.round += 1  
+        while self.round <= 4:
+            for player in self.players:
+                print(f"--- Round {self.round} ---")
+                if self.round == 1: 
+                    player.name = input(f"What is {player.trade.name}'s name? [{player.name}]: ") or player.name
+                for phase in ["Draw", "Payout", "Action"]:
+                    match phase:
+                        case "Draw":
+                            self.draw_card(player)
+                        case "Payout":
+                            self.calculate_payout(player)
+                        case "Action":
+                            self.action_phase(player)
+                            # Increment the round after the last player's Action phase
+                            if player == self.players[-1] :
+                                self.round += 1  
 
 # Run the game
 game = Game()
