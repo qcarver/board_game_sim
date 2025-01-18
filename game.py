@@ -125,13 +125,12 @@ class Game:
                 if self.round == 1: 
                     player.name = input(f"What is {player.trade.name}'s name? [{player.name}]: ") or player.name
                 for phase in ["Draw", "Payout", "Action"]:
-                    match phase:
-                        case "Draw":
-                            self.draw_card(player)
-                        case "Payout":
-                            self.calculate_payout(player)
-                        case "Action":
-                            self.action_phase(player)
+                    if phase == "Draw":
+                        self.draw_card(player)
+                    elif phase == "Payout":
+                        self.calculate_payout(player)
+                    elif phase == "Action":
+                        self.action_phase(player)
             # Increment the round after the last player's Action phase
             self.round += 1  
 
