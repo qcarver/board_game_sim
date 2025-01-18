@@ -1,112 +1,44 @@
-# Mercury Rails Game: A text-based game of resource management and strategy on Mercury.
-# The author qcarver@gmail.com does NOT authorize the use of this code for ANYTHING 
-# it is the intellectual property of the Carver family and shouldn't be destributed. 
-# Even worse, it is a work in progress and not ready for ANYONE ANYWAY. Good Talk! 
+"""
+@bref: This file contains the game logic for the game. It's the 'main'
+@details: it also has functions which deal with more than one class
+@author: qcarver@gmail.com
+@license: this is a WIP, it is private, not for distribution
+"""
+import copy
+from .player import Player, Trade   
+from .train import CarType, Car
+from .cards import Card, CardDeck
+from .money import Resources, power, heat, independence, order, imports, exports
 
-import random
 
-class Card:
-    def __init__(self, name, text, cost):
-        self.name = name  # Name of the card
-        self.text = text  # Description of the card's effect
-        self.cost = cost  # Dictionary of resource and quantity (e.g., {Resource.POWER: 2, Resource.HEAT: 1}) (e.g., [[Resource.POWER, 2], [Resource.HEAT, 1]])
+#min multiplier for resource payout
+RESOURCE_BASE = 2
 
-    def __str__(self):
-        return f"{self.name}"
-
-from enum import Enum
-
-class Resource(Enum):
-    POWER = 1
-    HEAT = 2
-    INDEPENDENCE = 3
-    ORDER = 4
-    IMPORTS = 5
-    EXPORTS = 6
-
-class Trade(Enum):
-    SMELTER = 1
-    LINEMAN = 2
-    NAVVY = 3
-    QUARRYMAN = 4
-    TECHNICIAN = 5
-
-class CarType(Enum):
-    FORGE = 1
-    TRACKLAYER = 2
-    EARTHMOVER = 3
-    EXCAVATOR = 4
-    ENGINE = 5
-
-class Car:
-    def __init__(self, car_type, proficiency=1):
-        self.car_type = car_type  # Enumerator for the car's type
-        self.proficiency = proficiency  # Proficiency level between 1 and 3
-
-class Player:
-    def __init__(self, name, trade):
-        self.name = name
-        self.trade = trade  # Enumerator for the player's trade
-        self.cards = []  # Player's card collection
-        self.train_cars = [["Train1", Car(car_type=CAR_TYPE_MAP[trade], proficiency=1)]]  # Initial train and car based on trade
-        self.resources = {resource: 0 for resource in Resource}  # Initialize all resource counts to 0
-        self.payout = {resource: 0 for resource in Resource}  # Track the player's previous payout
-
-class CardDeck:
-    def __init__(self, card_data):
-        """Initialize the CardDeck with card data from a CSV array."""
-        self.deck = []
-        for line in card_data:
-            parts = line.split(', ')
-            name = parts[0]
-            text = parts[1]
-            cost = {
-                Resource.POWER: int(parts[2]),
-                Resource.HEAT: int(parts[3]),
-                Resource.INDEPENDENCE: int(parts[4]),
-                Resource.ORDER: int(parts[5]),
-                Resource.IMPORTS: int(parts[6]),
-                Resource.EXPORTS: int(parts[7])
-            }
-            self.deck.append(Card(name, text, cost))
-        random.shuffle(self.deck)
-
-    def draw_card(self):
-        return self.deck.pop() if self.deck else None
-
-CAR_TYPE_MAP = {
-    Trade.SMELTER: CarType.FORGE,
-    Trade.LINEMAN: CarType.TRACKLAYER,
-    Trade.NAVVY: CarType.EARTHMOVER,
-    Trade.QUARRYMAN: CarType.EXCAVATOR,
-    Trade.TECHNICIAN: CarType.ENGINE
+TRADE_PAYOUT_MAP = {    #CCWR:2,        RESOURCE:4,     CCR:2
+    CarType.EXCAVATOR:  Resources((2,heat),         (4,independence), (2,imports)),
+    CarType.ENGINE:     Resources((2,independence), (4,imports),      (2,power)),
+    CarType.FOUNDARY:   Resources((2,imports),      (4,power),        (2,order)),
+    CarType.TRACKLAYER: Resources((2,power),        (4,order),        (2,exports)),
+    CarType.FORGE:      Resources((2,order),        (4,exports),      (2,heat))
 }
 
-TRADE_PAYOUT_MAP = {
-    CarType.FORGE: ["Power", "Exports", "Order"],
-    CarType.TRACKLAYER: ["Heat", "Exports", "Order"],
-    CarType.EARTHMOVER: ["Power", "Independence", "Imports"],
-    CarType.EXCAVATOR: ["Heat", "Independence", "Exports"],
-    CarType.ENGINE: ["Power", "Imports", "Order"]
-}
-
-def has_resources(player, card):
-    return (player.resources[Resource.POWER] >=        card.cost[Resource.POWER]        and
-            player.resources[Resource.HEAT] >=         card.cost[Resource.HEAT]         and
-            player.resources[Resource.INDEPENDENCE] >= card.cost[Resource.INDEPENDENCE] and
-            player.resources[Resource.ORDER] >=        card.cost[Resource.ORDER]        and
-            player.resources[Resource.IMPORTS] >=      card.cost[Resource.IMPORTS]      and
-            player.resources[Resource.EXPORTS] >=      card.cost[Resource.EXPORTS]      )
+def has_resources(player, card: Card) -> bool:
+    return (player.resources.components[power] >=        card.cost.components[power]        and
+            player.resources.components[heat] >=         card.cost.components[heat]         and
+            player.resources.components[independence] >= card.cost.components[independence] and
+            player.resources.components[order] >=        card.cost.components[order]        and
+            player.resources.components[imports] >=      card.cost.components[imports]      and
+            player.resources.components[exports] >=      card.cost.components[exports]      )
 
 class Game:
     def __init__(self):
         self.round = 1  # Initialize the game round
-        self.players = [
+        self.players =  [
             Player("CPU1", Trade.SMELTER),
-            Player("CPU2", Trade.LINEMAN),
+            Player("CPU2", Trade.BLACKSMITH),
             Player("CPU3", Trade.NAVVY),
             Player("CPU4", Trade.QUARRYMAN),
-            Player("CPU5", Trade.TECHNICIAN),
+            Player("CPU5", Trade.MACHINIST)
         ]
         #name, text,            power, heat, independence, order, imports, exports,   fxn, param
         self.card_deck = CardDeck([
@@ -119,7 +51,7 @@ class Game:
         "Steel, The difference between Steel and Iron is a little bit of Carbon and a lot of know how!, 1, 1, 0, 1, 0, 1, PyFxn, PyFxnParam", 
         "Increase Ti Yield, More efficient Titanium Extraction from Ilmenite, 2, 0, 0, 1, 0, 1, PyFxn, PyFxnParam", 
         "Blockade, This is our hill.. these are our beans, 1, 0, 1, 0, 1, 0, PyFxn, PyFxnParam", 
-        "Party, Workers Gone Wild, 0, 0, 0, 2, 1, 1, PyFxn, PyFxnParam", 
+        "Party, Workers Gone Wild,TRADE_PAYOUT_MAP,  0, 0, 0, 2, 1, 1, PyFxn, PyFxnParam", 
         "Bucket Buster, You can't shovel that, 1, 1, 1, 0, 1, 1, PyFxn, PyFxnParam", 
         "Solar Flare, Increases power production, 3, 0, 1, 0, 0, 1, PyFxn, PyFxnParam", 
         "Geothermal Vulcanism, Increases heat production, 3, 0, 1, 0, 0, 1, PyFxn, PyFxnParam", 
@@ -146,20 +78,17 @@ class Game:
                 print(f"{player.name} didn't draw a card.")
 
     def calculate_payout(self, player):
-        # Reset previous payout
-        player.payout = {resource: 0 for resource in Resource}
-        for _, car in player.train_cars:
-            car_payouts = TRADE_PAYOUT_MAP[car.car_type]
-            for resource_name in car_payouts:
-                resource_enum = Resource[resource_name.upper()]
-                player.resources[resource_enum] += car.proficiency
-                player.payout[resource_enum] += car.proficiency
-        # Display detailed payout information
         receipt = player.name + "'s Payout" 
-        for resource, amount in player.payout.items():
-            if amount > 0:
-                receipt += ", " + resource.name + "+" + str(amount) 
-        print(f"{receipt}")
+        resources_before_payout = copy.deepcopy(player.resources)
+        for car in player.train_cars:
+            # player's Resources = payout : Resources Resources::__imul__ int
+            player.resources += (TRADE_PAYOUT_MAP[car.car_type] * car.proficiency)
+
+        # Display detailed payout information
+        print(f"   {resources_before_payout}");
+        print(f" + {player.resources - resources_before_payout}");
+        print("-----------------------------------------")
+        print(f" = {player.resources}")
 
     def action_phase(self,player):
         """Handle the Action phase for a player."""
@@ -214,10 +143,10 @@ class Game:
                             self.calculate_payout(player)
                         case "Action":
                             self.action_phase(player)
-                            # Increment the round after the last player's Action phase
-                            if player == self.players[-1] :
-                                self.round += 1  
+            # Increment the round after the last player's Action phase
+            self.round += 1  
 
 # Run the game
 game = Game()
 game.run_game()
+
