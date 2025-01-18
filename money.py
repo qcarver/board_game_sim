@@ -9,7 +9,6 @@ are computed element-wise (by contained ResourceTypes) and return a new
 Resources object.
 @version 0.1
 """
-import random
 from enum import Enum
 
 class ResourceType(Enum):
@@ -92,8 +91,8 @@ class Resources:
         elif isinstance(other, ResourceType):
             self.components[other] += 1
         else:
-            return self
-        return NotImplemented
+            return NotImplemented
+        return self
     
     def __str__(self):
         # ANSI escape codes for colors

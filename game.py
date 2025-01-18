@@ -5,30 +5,11 @@
 @license: this is a WIP, it is private, not for distribution
 """
 import copy
-from .player import Player, Trade   
+#import pdb #pdb.set_trace() # to pause for debugging
+from .player import Player, Trade, TRADE_PAYOUT_MAP
 from .train import CarType, Car
 from .cards import Card, CardDeck
 from .money import Resources, power, heat, independence, order, imports, exports
-
-
-#min multiplier for resource payout
-RESOURCE_BASE = 2
-
-TRADE_PAYOUT_MAP = {    #CCWR:2,        RESOURCE:4,     CCR:2
-    CarType.EXCAVATOR:  Resources((2,heat),         (4,independence), (2,imports)),
-    CarType.ENGINE:     Resources((2,independence), (4,imports),      (2,power)),
-    CarType.FOUNDARY:   Resources((2,imports),      (4,power),        (2,order)),
-    CarType.TRACKLAYER: Resources((2,power),        (4,order),        (2,exports)),
-    CarType.FORGE:      Resources((2,order),        (4,exports),      (2,heat))
-}
-
-def has_resources(player, card: Card) -> bool:
-    return (player.resources.components[power] >=        card.cost.components[power]        and
-            player.resources.components[heat] >=         card.cost.components[heat]         and
-            player.resources.components[independence] >= card.cost.components[independence] and
-            player.resources.components[order] >=        card.cost.components[order]        and
-            player.resources.components[imports] >=      card.cost.components[imports]      and
-            player.resources.components[exports] >=      card.cost.components[exports]      )
 
 class Game:
     def __init__(self):
@@ -61,7 +42,7 @@ class Game:
         "Civil Service Day, Usually we aren't very civil, 0, 0, 0, 3, 0, 2, PyFxn, PyFxnParam", 
         "Rail Damage, Railways on Mercury, 0, 1, 0, 1, 0, 1, PyFxn, PyFxnParam"
         ])
-
+    
     def draw_card(self,player):
         response = input(f"{player.name} (draw card)? [Y]: ") or "Y"
         if response.lower() == 'q':
@@ -76,6 +57,14 @@ class Game:
                 print("The deck is empty!")
         else :
                 print(f"{player.name} didn't draw a card.")
+
+    def has_resources(self, player, card: Card) -> bool:
+        return (player.resources.components[power] >=        card.cost.components[power]        and
+                player.resources.components[heat] >=         card.cost.components[heat]         and
+                player.resources.components[independence] >= card.cost.components[independence] and
+                player.resources.components[order] >=        card.cost.components[order]        and
+                player.resources.components[imports] >=      card.cost.components[imports]      and
+                player.resources.components[exports] >=      card.cost.components[exports]      )
 
     def calculate_payout(self, player):
         receipt = player.name + "'s Payout" 
@@ -95,7 +84,7 @@ class Game:
         print("Actions available:")
         for index, card in enumerate(player.cards, start=1):
             # Assuming you have a function `has_resources(player, card)` that checks if the player has the necessary resources
-            if has_resources(player, card):
+            if self.has_resources(player, card):
                 print(f"{index}. {card}")
             else:
                 print(f"\033[9m{index}. {card}\033[0m")
