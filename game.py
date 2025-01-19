@@ -110,8 +110,11 @@ class Game:
             card_index = int(action_input) - 1
             if 0 <= card_index < len(player.cards):
                 selected_card = player.cards[card_index]
-                print(f"Playing card: {selected_card}")
-                        # Implement card action logic here
+                if self.has_resources(player, selected_card):
+                    print(f"Playing card: {selected_card}")
+                    # Implement card action logic here
+                else:
+                    print(f"Not enough resources to play card")
                 valid_input = True
             else:
                 print("Invalid card selection.")
