@@ -75,11 +75,11 @@ class Game:
         """Handle the Action phase for a player."""
         print("Actions available:")
         for index, card in enumerate(player.cards, start=1):
-            # Assuming you have a function `has_resources(player, card)` that checks if the player has the necessary resources
-            if self.has_resources(player, card):
+            # Can the player afford to play the card? 
+            if card.cost <= player.resources:
                 print(f"{index}. {card}")
             else:
-                print(f"\033[9m{index}. {card}\033[0m")
+                print(f"\033[9m\033[38;5;246m{index}. {card}\033[0m")
         print("B. Barter")
         print("P. Pass")
 
@@ -102,7 +102,7 @@ class Game:
             card_index = int(action_input) - 1
             if 0 <= card_index < len(player.cards):
                 selected_card = player.cards[card_index]
-                if self.has_resources(player, selected_card):
+                if selected_card.cost <= player.resources:
                     print(f"Playing card: {selected_card}")
                     # Implement card action logic here
                 else:

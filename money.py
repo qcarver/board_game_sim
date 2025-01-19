@@ -9,6 +9,7 @@ are computed element-wise (by contained ResourceTypes) and return a new
 Resources object.
 @version 0.1
 """
+import operator
 from enum import Enum
 
 class ResourceType(Enum):
@@ -93,19 +94,35 @@ class Resources:
         else:
             return NotImplemented
         return self
-    
-    # less than - compares each resource type
+
+    def compare(self, other, op):
+        ops = {
+            '<': operator.lt,
+            '<=': operator.le,
+            '==': operator.eq,
+            '!=': operator.ne,
+            '>': operator.gt,
+            '>=': operator.ge
+        }
+        return all(ops[op](self.components[resource], other.components[resource]) for resource in self.components)
+
     def __lt__(self, other):
-        return (self.components[power] <        other.components[power]        and
-                self.components[heat] <         other.components[heat]         and
-                self.components[independence] < other.components[independence] and
-                self.components[order] <        other.components[order]        and
-                self.components[imports] <      other.components[imports]      and
-                self.components[exports] <      other.components[exports])
-    
-    #greater than or equal to - same thing as not less than
+        return self.compare(other, '<')
+
+    def __le__(self, other):
+        return self.compare(other, '<=')
+
+    def __eq__(self, other):
+        return self.compare(other, '==')
+
+    def __ne__(self, other):
+        return self.compare(other, '!=')
+
+    def __gt__(self, other):
+        return self.compare(other, '>')
+
     def __ge__(self, other):
-        return not self.__lt__(other)
+        return self.compare(other, '>=')
     
     def __str__(self):
         # ANSI escape codes for colors
