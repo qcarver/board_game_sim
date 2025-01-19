@@ -94,6 +94,19 @@ class Resources:
             return NotImplemented
         return self
     
+    # less than - compares each resource type
+    def __lt__(self, other):
+        return (self.components[power] <        other.components[power]        and
+                self.components[heat] <         other.components[heat]         and
+                self.components[independence] < other.components[independence] and
+                self.components[order] <        other.components[order]        and
+                self.components[imports] <      other.components[imports]      and
+                self.components[exports] <      other.components[exports])
+    
+    #greater than or equal to - same thing as not less than
+    def __ge__(self, other):
+        return not self.__lt__(other)
+    
     def __str__(self):
         # ANSI escape codes for colors
         DARK_YELLOW = "\033[33m"

@@ -58,14 +58,6 @@ class Game:
         else :
                 print(f"{player.name} didn't draw a card.")
 
-    def has_resources(self, player, card: Card) -> bool:
-        return (player.resources.components[power] >=        card.cost.components[power]        and
-                player.resources.components[heat] >=         card.cost.components[heat]         and
-                player.resources.components[independence] >= card.cost.components[independence] and
-                player.resources.components[order] >=        card.cost.components[order]        and
-                player.resources.components[imports] >=      card.cost.components[imports]      and
-                player.resources.components[exports] >=      card.cost.components[exports]      )
-
     def calculate_payout(self, player):
         receipt = player.name + "'s Payout" 
         resources_before_payout = copy.deepcopy(player.resources)
