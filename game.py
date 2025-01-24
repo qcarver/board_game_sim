@@ -71,6 +71,58 @@ class Game:
         print("-----------------------------------------")
         print(f" = {player.resources}")
 
+    def barter(self, player):
+        """Handle the Barter phase for a player."""
+        player_options = " ".join([f"({i+1}) {p.name}" for i, p in enumerate(self.players)])
+        print(f"Barter with {player_options} ?")
+        selected_player_index = input("Choose a player to barter with: ").strip()
+        if selected_player_index.isdigit():
+            selected_player_index = int(selected_player_index)
+            if 1 <= selected_player_index <= len(self.players):
+                selected_player = self.players[selected_player_index - 1]
+                player.other = selected_player.name
+                print(f"{player.name} will barter with {selected_player.name}.")
+        else:
+            print("Invalid input. Please enter a valid player number.")
+            return False
+        
+        print("What are you offering to trade?")
+        print("0. Nothing")
+        if player.cards:
+            for index, card in enumerate(player.cards, start=1):
+                print(f"{index}. Card: {card}")
+        if player.resources:
+            print("Resources:")
+            for resource, quantity in player.resources.components.items():
+                if quantity > 0:
+                    print(f"{resource.name[0].upper()}. {resource.name}: {quantity}")
+        
+        offer_input = input("Choose what to offer (number): ").strip()
+        if offer_input.isdigit():
+            offer_index = int(offer_input)
+            if 1 <= offer_index <= len(player.cards):
+                offered_item = player.cards[offer_index - 1]
+                print(f"{player.name} offers {offered_item}.")
+            elif len(player.cards) < offer_index <= len(player.cards) + len(player.resources):
+                resource_index = offer_index - len(player.cards) - 1
+                resource_name = list(player.resources.keys())[resource_index]
+                quantity = input(f"How much {resource_name} to offer? ").strip()
+            print("Thank you for participating in the barter prototype. Implementation is incomplete.")
+            return False
+            # AttributeError: 'Resources' object has no attribute 'isdigit' <<<<<<<
+            #if quantity.isdigit() and int(quantity) <= player.resources[resource_name]:
+            #    offered_item = {resource_name: int(quantity)}
+            #    print(f"{player.name} offers {offered_item}.")
+            #else:
+            #    print("Invalid quantity.")
+            #    return False
+            #else:
+                #print("Invalid selection.")
+                #return False
+        else:
+            print("Invalid input.")
+            return False
+
     def action_phase(self,player):
         """Handle the Action phase for a player."""
         print("Actions available:")
@@ -89,8 +141,8 @@ class Game:
             if not action_input:
                 action_input = "P"
             if action_input.startswith("B"):
-                print("Barter selected. Implement barter logic here.")
-                valid_input = True
+                barter_successful = self.barter(player)
+                valid_input = barter_successful
             elif action_input.startswith("P"):
                 print(f"{player.name} passes the action phase.")
                 valid_input = True
