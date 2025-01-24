@@ -12,6 +12,16 @@ Resources object.
 import operator
 from enum import Enum
 
+# Define the color_map dictionary outside the class
+color_map = {
+    "POWER": ("DARK_YELLOW", "\033[33m", 1),
+    "HEAT": ("DARK_ORANGE", "\033[38;5;208m", 2),
+    "INDEPENDENCE": ("DARK_PINK", "\033[38;5;197m", 3),
+    "ORDER": ("CORPORATE_BLUE", "\033[34m", 4),
+    "IMPORTS": ("FORREST_GREEN", "\033[32m", 5),
+    "EXPORTS": ("MEDIUM_DARK_GRAY", "\033[38;5;240m", 6)
+}
+
 class ResourceType(Enum):
     """
     @brief ResourceType is an enumeration of the different types of resources
@@ -25,13 +35,36 @@ class ResourceType(Enum):
     IMPORTS = 5
     EXPORTS = 6
 
-    #Eg: resources = ResourcesType.POWER * 2
+    def __init__(self, value):
+        """
+        @brief Initialize the ResourceType with its corresponding color and value.
+        @param value The value of the enum member.
+        """
+        color_name, color_code, _ = color_map[self.name]
+        self.color_name = color_name
+        self.color_code = color_code
+
+    def markup(self):
+        """
+        @brief Returns the ANSI escape code for this resource type's color.
+        @return The ANSI escape code as a string.
+        """
+        return self.color_code
+    
+    def color(self):
+        """
+        @brief Returns the color name for this resource type.
+        @return The color name as a string. 
+        """
+        return self.color_name
+
+    # Eg: resources = ResourceType.POWER * 2
     def __mul__(self, quantity):
         return Resources((quantity, self))
 
-    #Eg: rmul just uses mul as its delegate 
+    # Eg: rmul just uses mul as its delegate 
     def __rmul__(self, quantity):
-        return self.__mul__(quantity)    
+        return self.__mul__(quantity)
 
 # Shorthand references
 power = ResourceType.POWER
@@ -40,6 +73,8 @@ independence = ResourceType.INDEPENDENCE
 order = ResourceType.ORDER
 imports = ResourceType.IMPORTS
 exports = ResourceType.EXPORTS
+
+RESET = "\033[0m"
 
 """
 @brief Resources is a collection of quantities of ResourceTypes 
@@ -125,20 +160,7 @@ class Resources:
         return self.compare(other, '>=')
     
     def __str__(self):
-        # ANSI escape codes for colors
-        DARK_YELLOW = "\033[33m"
-        DARK_ORANGE = "\033[38;5;208m"
-        DARK_PINK = "\033[38;5;197m"
-        CORPORATE_BLUE = "\033[34m"
-        FORREST_GREEN = "\033[32m"
-        MEDIUM_DARK_GRAY = "\033[38;5;240m"
-        RESET = "\033[0m"
-
-        return (
-            f"{DARK_YELLOW}Power: {self.components[ResourceType.POWER]:>4}{RESET}, "
-            f"{DARK_ORANGE}Heat: {self.components[ResourceType.HEAT]:>4}{RESET}, "
-            f"{DARK_PINK}Independence: {self.components[ResourceType.INDEPENDENCE]:>4}{RESET}, "
-            f"{CORPORATE_BLUE}Order: {self.components[ResourceType.ORDER]:>4}{RESET}, "
-            f"{FORREST_GREEN}Imports: {self.components[ResourceType.IMPORTS]:>4}{RESET}, "
-            f"{MEDIUM_DARK_GRAY}Exports: {self.components[ResourceType.EXPORTS]:>4}{RESET}"
+        return ", ".join(
+            f"{resource.markup()}{resource.name.lower().capitalize()}: {self.components[resource]:>4}{RESET}"
+            for resource in ResourceType
         )

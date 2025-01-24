@@ -94,6 +94,9 @@ class Game:
             elif action_input.startswith("P"):
                 print(f"{player.name} passes the action phase.")
                 valid_input = True
+            elif action_input == "q":
+                print("Game terminated by user.")
+                exit()
             else:
                 self.play_selected_card(player, action_input)
 
