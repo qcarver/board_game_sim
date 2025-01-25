@@ -4,7 +4,7 @@
 """
 
 import random
-from .money import Resources, power, heat, independence, order, imports, exports
+from .resources import Resources, power, heat, freedom, order, imports, exports
 
 class Card:
     def __init__(self, name, text, cost: Resources):
@@ -47,7 +47,7 @@ class CardDeck:
             name = parts[0]
             text = parts[1]
             cost = (power * int(parts[2]) + heat * int(parts[3]) + 
-                   independence * int(parts[4]) + order * int(parts[5]) + 
+                   freedom * int(parts[4]) + order * int(parts[5]) + 
                    imports * int(parts[6]) + exports * int(parts[7]))
             self.deck.append(Card(name, text, cost))
         random.shuffle(self.deck)

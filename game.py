@@ -9,7 +9,8 @@ import copy
 from .player import Player, Trade, TRADE_PAYOUT_MAP
 from .train import CarType, Car
 from .cards import Card, CardDeck
-from .money import Resources, power, heat, independence, order, imports, exports
+from .resources import Resources, power, heat, freedom, order, imports, exports
+from .transaction import TransactionUI
 
 class Game:
     def __init__(self):
@@ -21,7 +22,7 @@ class Game:
             Player("CPU4", Trade.QUARRYMAN),
             Player("CPU5", Trade.MACHINIST)
         ]
-        #name, text,            power, heat, independence, order, imports, exports,   fxn, param
+        #name, text,            power, heat, freedom, order, imports, exports,   fxn, param
         self.card_deck = CardDeck([
         "Stop Train, Everything that goes - stops, 0, 0, 2, 2, 1, 0, PyFxn, PyFxnParam", 
         "Decrease Speed, Whoah Big Fella!, 0, 0, 1, 0, 1, 0, PyFxn, PyFxnParam", 
@@ -71,57 +72,22 @@ class Game:
         print("-----------------------------------------")
         print(f" = {player.resources}")
 
-    def barter(self, player):
+    def transact(self, player):
+        success = False
         """Handle the Barter phase for a player."""
         player_options = " ".join([f"({i+1}) {p.name}" for i, p in enumerate(self.players)])
-        print(f"Barter with {player_options} ?")
-        selected_player_index = input("Choose a player to barter with: ").strip()
+        print(f"Transact with {player_options} ?")
+        selected_player_index = input("Choose a player to transact with: ").strip()
         if selected_player_index.isdigit():
             selected_player_index = int(selected_player_index)
             if 1 <= selected_player_index <= len(self.players):
                 selected_player = self.players[selected_player_index - 1]
-                player.other = selected_player.name
-                print(f"{player.name} will barter with {selected_player.name}.")
+                success = TransactionUI(player, selected_player).prompt()
+
         else:
             print("Invalid input. Please enter a valid player number.")
-            return False
+            return success
         
-        print("What are you offering to trade?")
-        print("0. Nothing")
-        if player.cards:
-            for index, card in enumerate(player.cards, start=1):
-                print(f"{index}. Card: {card}")
-        if player.resources:
-            print("Resources:")
-            for resource, quantity in player.resources.components.items():
-                if quantity > 0:
-                    print(f"{resource.name[0].upper()}. {resource.name}: {quantity}")
-        
-        offer_input = input("Choose what to offer (number): ").strip()
-        if offer_input.isdigit():
-            offer_index = int(offer_input)
-            if 1 <= offer_index <= len(player.cards):
-                offered_item = player.cards[offer_index - 1]
-                print(f"{player.name} offers {offered_item}.")
-            elif len(player.cards) < offer_index <= len(player.cards) + len(player.resources):
-                resource_index = offer_index - len(player.cards) - 1
-                resource_name = list(player.resources.keys())[resource_index]
-                quantity = input(f"How much {resource_name} to offer? ").strip()
-            print("Thank you for participating in the barter prototype. Implementation is incomplete.")
-            return False
-            # AttributeError: 'Resources' object has no attribute 'isdigit' <<<<<<<
-            #if quantity.isdigit() and int(quantity) <= player.resources[resource_name]:
-            #    offered_item = {resource_name: int(quantity)}
-            #    print(f"{player.name} offers {offered_item}.")
-            #else:
-            #    print("Invalid quantity.")
-            #    return False
-            #else:
-                #print("Invalid selection.")
-                #return False
-        else:
-            print("Invalid input.")
-            return False
 
     def action_phase(self,player):
         """Handle the Action phase for a player."""
@@ -132,17 +98,17 @@ class Game:
                 print(f"{index}. {card}")
             else:
                 print(f"\033[9m\033[38;5;246m{index}. {card}\033[0m")
-        print("B. Barter")
+        print("T. Transact")
         print("P. Pass")
 
         valid_input = False
         while not valid_input:
-            action_input = input("Choose an action (1, 2, ..., B, P)[P]: ").strip().upper()
+            action_input = input("Choose an action (1, 2, ..., T, P)[P]: ").strip().upper()
             if not action_input:
                 action_input = "P"
-            if action_input.startswith("B"):
-                barter_successful = self.barter(player)
-                valid_input = barter_successful
+            if action_input.startswith("T"):
+                transaction_successful = self.transact(player)
+                valid_input = transaction_successful
             elif action_input.startswith("P"):
                 print(f"{player.name} passes the action phase.")
                 valid_input = True

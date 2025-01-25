@@ -4,7 +4,7 @@
 @license: this is a WIP, it is private, not for distribution
 """
 from enum import Enum
-from .money import Resources, power, heat, independence, order, imports, exports
+from .resources import Resources, power, heat, freedom, order, imports, exports
 from .train import Car, CarType
 
 class Trade(Enum):
@@ -23,18 +23,30 @@ CAR_TYPE_MAP = {
 }
 
 TRADE_PAYOUT_MAP = {    #CCWR:2,        RESOURCE:4,     CCR:2
-    CarType.EXCAVATOR:  Resources((2,heat),         (4,independence), (2,imports)),
-    CarType.ENGINE:     Resources((2,independence), (4,imports),      (2,power)),
+    CarType.EXCAVATOR:  Resources((2,heat),         (4,freedom), (2,imports)),
+    CarType.ENGINE:     Resources((2,freedom), (4,imports),      (2,power)),
     CarType.FOUNDARY:   Resources((2,imports),      (4,power),        (2,order)),
     CarType.TRACKLAYER: Resources((2,power),        (4,order),        (2,exports)),
     CarType.FORGE:      Resources((2,order),        (4,exports),      (2,heat))
 }
 
 class Player:
+
+    _id_counter = 0
+
+    @classmethod
+    def _generate_id(cls):
+        cls._id_counter += 1
+        return cls._id_counter
+
     def __init__(self, name, trade):
         self.name = name
         self.trade = trade  # Enumerator for the player's trade
         self.cards = []  # Player's card collection
         self.train_cars = [Car(car_type=CAR_TYPE_MAP[trade], proficiency=1)]  # Initial train and car based on trade
         self.resources = Resources()  # Initialize the player's resources to 0
+        self.id = self._generate_id()
 
+    @classmethod
+    def get_player_by_id(cls, player_id):
+        return cls._players.get(player_id)

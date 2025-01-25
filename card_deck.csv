@@ -1,4 +1,4 @@
-"Name,Flavor Text,POWER,HEAT,INDEPENDENCE,ORDER,IMPORTS,EXPORTS,PyFxn,Params…",
+"Name,Flavor Text,POWER,HEAT,FREEDOM,ORDER,IMPORTS,EXPORTS,PyFxn,Params…",
 "Stop Train, Everything that goes - stops,0,0,2,2,1,0,PyFxn,PyFxnParam",
 "Decrease Speed,Whoah Big Fella!,0,0,1,0,1,0,PyFxn,PyFxnParam",
 "Increase Speed, Increases power production,2,2,1,0,1,0,PyFxn,PyFxnParam",
