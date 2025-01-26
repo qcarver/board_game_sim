@@ -50,3 +50,15 @@ class Player:
     @classmethod
     def get_player_by_id(cls, player_id):
         return cls._players.get(player_id)
+    
+    def __str__(self):
+        column = f"{self.name} holds:\n{'-' * (len(self.name) + 7)}\n"
+        column += "0. Nothing\n"
+        if self.cards:
+            for index, card in enumerate(self.cards, start=1):
+                column += f"{index}. Card: {card}\n"
+        if self.resources:
+            for resource, quantity in self.resources.components.items():
+                if quantity > 0:
+                    column += f"{resource.name[0].upper()}. {resource.name}: {quantity}\n"
+        return column
