@@ -44,6 +44,14 @@ class ResourceType(Enum):
         self.color_name = color_name
         self.color_code = color_code
 
+    @staticmethod
+    def with_initial(char):
+        char = char.upper()
+        for resource in ResourceType:
+            if resource.name.startswith(char):
+                return resource
+        return None
+
     def markup(self):
         """
         @brief Returns the ANSI escape code for this resource type's color.
@@ -89,14 +97,6 @@ class Resources:
         for quantity, resource in args:
             if resource in self.components:
                 self.components[resource] += quantity
-    
-    @staticmethod
-    def with_initial(char):
-        char = char.upper()
-        for resource in ResourceType:
-            if resource.name.startswith(char):
-                return resource
-        return None
     
     def __add__(self, other):
         if isinstance(other, Resources):
