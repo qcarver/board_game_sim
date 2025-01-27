@@ -16,7 +16,7 @@ from enum import Enum
 color_map = {
     "POWER": ("DARK_YELLOW", "\033[33m", 1),
     "HEAT": ("DARK_ORANGE", "\033[38;5;208m", 2),
-    "INDEPENDENCE": ("DARK_PINK", "\033[38;5;197m", 3),
+    "FREEDOM": ("DARK_PINK", "\033[38;5;197m", 3),
     "ORDER": ("CORPORATE_BLUE", "\033[34m", 4),
     "IMPORTS": ("FORREST_GREEN", "\033[32m", 5),
     "EXPORTS": ("MEDIUM_DARK_GRAY", "\033[38;5;240m", 6)
@@ -26,11 +26,11 @@ class ResourceType(Enum):
     """
     @brief ResourceType is an enumeration of the different types of resources
     @details It's used to reference an instance of a type of resource. 
-    Note ez shorthands are: power, heat, independence, order, imports, exports
+    Note ez shorthands are: power, heat, freedom, order, imports, exports
     """ 
     POWER = 1
     HEAT = 2
-    INDEPENDENCE = 3
+    FREEDOM = 3
     ORDER = 4
     IMPORTS = 5
     EXPORTS = 6
@@ -69,7 +69,7 @@ class ResourceType(Enum):
 # Shorthand references
 power = ResourceType.POWER
 heat = ResourceType.HEAT
-independence = ResourceType.INDEPENDENCE
+freedom = ResourceType.FREEDOM
 order = ResourceType.ORDER
 imports = ResourceType.IMPORTS
 exports = ResourceType.EXPORTS
@@ -89,7 +89,15 @@ class Resources:
         for quantity, resource in args:
             if resource in self.components:
                 self.components[resource] += quantity
-
+    
+    @staticmethod
+    def with_initial(char):
+        char = char.upper()
+        for resource in ResourceType:
+            if resource.name.startswith(char):
+                return resource
+        return None
+    
     def __add__(self, other):
         if isinstance(other, Resources):
             new_resources = Resources()
