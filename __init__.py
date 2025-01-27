@@ -4,7 +4,7 @@
 # Even worse, it is a work in progress and not ready for ANYONE ANYWAY. Good Talk! 
 
 # filepath: /home/qcarver/Documents/NightTrain/board_game_sim/__init__.py
-from .money import ResourceType, Resources
+from .resources import ResourceType, Resources
 from .player import Player
 from .cards import Card, CardDeck
 from .game import Game
