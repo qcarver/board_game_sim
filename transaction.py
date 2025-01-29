@@ -69,15 +69,19 @@ class Transaction:
         """
         @brief Accept the transaction and transfer resources and cards.
         """
+        # Transfer resources from offering player to receiving player
         for resource_type, quantity in self.offering_details.resources.components.items():
             self.receiving_details.player.resources.components[resource_type] += quantity
 
+        # Transfer cards from offering player to receiving player
         for card in self.offering_details.cards:
             self.receiving_details.player.cards.append(card)
 
+        # Transfer resources from receiving player to offering player
         for resource_type, quantity in self.receiving_details.resources.components.items():
             self.offering_details.player.resources.components[resource_type] += quantity
 
+        # Transfer cards from receiving player to offering player
         for card in self.receiving_details.cards:
             self.offering_details.player.cards.append(card)
 
@@ -172,7 +176,7 @@ class TransactionUI:
         """
         self.print_two_columns(self.offering_player.__str__(), self.receiving_player.__str__()) 
 
-        pattern = re.compile(r'^[0-5]:((\d+|[HEFOI]\d+)(\+(\d+|[HEFOI]\d+))*)?>[0-5]:((\d+|[HEFOI]\d+)(\+(\d+|[HEFOI]\d+))*)?$')
+        pattern = re.compile(r'^[0-5]:((\d+|[HPFOIE]\d+)(\+(\d+|[HPFOIE]\d+))*)?>[0-5]:((\d+|[HPFOIE]\d+)(\+(\d+|[HPFOIE]\d+))*)?$')
         
         while True:
             user_input = input("Enter your transaction (Eg: {offering_player.id}:1+H1+P2>{receiving_player.id}:F1+I1)")

@@ -134,6 +134,31 @@ class Game:
         except ValueError:
             print("Invalid input. Please choose a valid action.")
 
+    def print_ascii_boxes(self, num_boxes=36):
+        if num_boxes < 1:
+            return
+
+        top_row = "┌"
+        middle_rows = ["│" for _ in range(5)]
+        bottom_row = "└"
+
+        for i in range(num_boxes):
+            if (i + 1) % 12 == 0:
+                top_row += "\033[31m▄▄\033[0m┬" if i < num_boxes - 1 else "\033[31m▄▄\033[0m┐"
+                for j in range(5):
+                    middle_rows[j] += "\033[31m  \033[0m│"
+                bottom_row += "\033[31m▀▀\033[0m┴" if i < num_boxes - 1 else "\033[31m▀▀\033[0m┘"
+            else:
+                top_row += "──┬" if i < num_boxes - 1 else "──┐"
+                for j in range(5):
+                    middle_rows[j] += "  │"
+                bottom_row += "──┴" if i < num_boxes - 1 else "──┘"
+
+        print(top_row)
+        for row in middle_rows:
+            print(row)
+        print(bottom_row)
+    
     def run_game(self):
         while self.round <= 4:
             for player in self.players:
@@ -149,6 +174,7 @@ class Game:
                         self.action_phase(player)
             # Increment the round after the last player's Action phase
             self.round += 1  
+            self.print_ascii_boxes()  # This will use the default value of 36            
 
 # Run the game
 game = Game()
