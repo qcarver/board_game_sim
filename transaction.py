@@ -10,6 +10,9 @@ from .player import Player
 import re
 import pdb #pdb.set_trace() # to pause for debugging
 
+def strip_ansi_codes(text):
+    ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
+    return ansi_escape.sub('', text)
 
 class Transaction:
     """
@@ -144,8 +147,6 @@ class TransactionUI:
         self.receiving_player = receiving_player
         self.transaction = Transaction(offering_player, receiving_player)
 
-
-
     def print_two_columns(self, left_column, right_column, column_width: int = 40):
         """
         Prints two columns of data side by side, left-justified.
@@ -155,20 +156,23 @@ class TransactionUI:
             right_column (list): List of strings for the right column.
             column_width (int): Width allocated to each column.
         """
+        # Split columns into lists of lines
+        left_column_lines = left_column.split('\n')
+        right_column_lines = right_column.split('\n')
+        
         # Determine the maximum number of rows
-        left_rows = left_column.count("\n") + 1
-        right_rows = right_column.count("\n") + 1   
-        max_rows = max(left_rows, right_rows)
+        max_rows = max(len(left_column_lines), len(right_column_lines))
         
         # Pad shorter column with empty strings
-        left_column = left_column + "\n" * (max_rows - left_rows)
-        right_column = right_column + "\n" *  (max_rows - right_rows)
+        left_column_lines += [""] * (max_rows - len(left_column_lines))
+        right_column_lines += [""] * (max_rows - len(right_column_lines))
         
         # Print each row with left-justified columns
-        left_lines = left_column.split('\n')
-        right_lines = right_column.split('\n')
-        for left, right in zip(left_lines, right_lines):
-            print(f"{left.ljust(column_width)}{right.ljust(column_width)}")
+        for left, right in zip(left_column_lines, right_column_lines):
+            left_stripped = strip_ansi_codes(left)
+            right_stripped = strip_ansi_codes(right)
+            print(f"{left.ljust(column_width + len(left) - len(left_stripped))}{right.ljust(column_width + len(right) - len(right_stripped))}")
+
 
     def prompt(self):
         """
@@ -214,7 +218,7 @@ class TransactionUI:
                     self.transaction.receiving_details.offer_card(self.receiving_player.cards[card_index])
             else:
                 # Handle resource offering
-                resource_type = ResourceType[item[0]]
+                resource_type = ResourceType.with_initial(item[0])
                 quantity = int(item[1:])
                 self.transaction.receiving_details.offer_resources(resource_type, quantity)
         

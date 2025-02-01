@@ -28,9 +28,9 @@ class Card:
                 gauge_string += gauge_chars[remainder - 1]
             
             # Concatenate the gauge with the resource color
-            resource_gauge += f"{resource.markup()}{gauge_string}"
+            resource_gauge += f"{resource.markup()}{gauge_string}\033[0m"
     
-        return f"{self.name}: {resource_gauge.strip()}"
+        return f"{self.name}: {resource_gauge} "
     
     #def __str__(self):
     #    return ", ".join(
