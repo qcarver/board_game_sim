@@ -5,14 +5,10 @@
 @version 0.1
 """
 
-from .resources import ResourceType, Resources
-from .player import Player
+from resources import ResourceType, Resources
+from player import Player
 import re
 import pdb #pdb.set_trace() # to pause for debugging
-
-def strip_ansi_codes(text):
-    ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
-    return ansi_escape.sub('', text)
 
 class Transaction:
     """
@@ -147,39 +143,13 @@ class TransactionUI:
         self.receiving_player = receiving_player
         self.transaction = Transaction(offering_player, receiving_player)
 
-    def print_two_columns(self, left_column, right_column, column_width: int = 40):
-        """
-        Prints two columns of data side by side, left-justified.
-        
-        Args:
-            left_column (list): List of strings for the left column.
-            right_column (list): List of strings for the right column.
-            column_width (int): Width allocated to each column.
-        """
-        # Split columns into lists of lines
-        left_column_lines = left_column.split('\n')
-        right_column_lines = right_column.split('\n')
-        
-        # Determine the maximum number of rows
-        max_rows = max(len(left_column_lines), len(right_column_lines))
-        
-        # Pad shorter column with empty strings
-        left_column_lines += [""] * (max_rows - len(left_column_lines))
-        right_column_lines += [""] * (max_rows - len(right_column_lines))
-        
-        # Print each row with left-justified columns
-        for left, right in zip(left_column_lines, right_column_lines):
-            left_stripped = strip_ansi_codes(left)
-            right_stripped = strip_ansi_codes(right)
-            print(f"{left.ljust(column_width + len(left) - len(left_stripped))}{right.ljust(column_width + len(right) - len(right_stripped))}")
+
 
 
     def prompt(self):
         """
         @brief Prompt the user with the current state of the offering and receiving players.
         """
-        self.print_two_columns(self.offering_player.__str__(), self.receiving_player.__str__()) 
-
         pattern = re.compile(r'^[0-5]:((\d+|[HPFOIE]\d+)(\+(\d+|[HPFOIE]\d+))*)?>[0-5]:((\d+|[HPFOIE]\d+)(\+(\d+|[HPFOIE]\d+))*)?$')
         
         while True:

@@ -4,8 +4,8 @@
 @license: this is a WIP, it is private, not for distribution
 """
 from enum import Enum
-from .resources import Resources, power, heat, freedom, order, imports, exports
-from .train import Car, CarType
+from resources import Resources, power, heat, freedom, order, imports, exports
+from train import Car, CarType
 
 class Trade(Enum):
     QUARRYMAN = 1
@@ -33,6 +33,7 @@ TRADE_PAYOUT_MAP = {    #CCWR:2,        RESOURCE:4,     CCR:2
 class Player:
 
     _id_counter = 0
+    _players = []
 
     @classmethod
     def _generate_id(cls):
@@ -45,7 +46,8 @@ class Player:
         self.cards = []  # Player's card collection
         self.train_cars = [Car(car_type=CAR_TYPE_MAP[trade], proficiency=1)]  # Initial train and car based on trade
         self.resources = Resources()  # Initialize the player's resources to 0
-        self.id = self._generate_id()
+        players += self
+        self.id = players.length
 
     @classmethod
     def get_player_by_id(cls, player_id):

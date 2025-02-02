@@ -4,7 +4,7 @@
 """
 
 import random
-from .resources import Resources, power, heat, freedom, order, imports, exports
+from resources import Resources, power, heat, freedom, order, imports, exports
 
 class Card:
     def __init__(self, name, text, cost: Resources):
