@@ -14,11 +14,13 @@ from resources import Resources, power, heat, freedom, order, imports, exports
 # Game.py
 import copy
 from ui import GameUI  # Import our UI abstraction
-from player import Player, Trade, TRADE_PAYOUT_MAP  # Assuming these are in player.py
-from train import CarType, Car  # Assuming these are in train.py
-from cards import Card, CardDeck  # Assuming these are in cards.py
-from resources import Resources, power, heat, freedom, order, imports, exports  # Assuming these are in resources.py
-from transaction import TransactionUI  # Assuming this is in transaction.py
+from player import Player, Trade, TRADE_PAYOUT_MAP
+from train import CarType, Car 
+from cards import Card, CardDeck 
+from resources import Resources, power, heat, freedom, order, imports, exports
+from transaction import Transaction
+
+players =  []
 
 class Game:
     def __init__(self, ui: GameUI):
@@ -81,16 +83,13 @@ class Game:
 
     def transact(self, player):
         success = False
-        player_options = " ".join([f"({i+1}) {p.name}" for i, p in enumerate(self.players)])
-        self.ui.display_message(f"Transact with {player_options}?")
-        selected_player_index = self.ui.prompt_input("Choose a player to transact with: ").strip()
-        if selected_player_index.isdigit():
-            selected_player_index = int(selected_player_index)
-            if 1 <= selected_player_index <= len(self.players):
-                selected_player = self.players[selected_player_index - 1]
-                success = TransactionUI(player, selected_player, self.ui).prompt()
+        transaction = self.ui.prompt_transaction_input()
+        if transaction:
+            transaction.accept()
+            self.ui.display_message("Transaction successful.")
+            success = True
         else:
-            self.ui.display_message("Invalid input. Please enter a valid player number.")
+            self.ui.display_message("Transaction failed.")
         return success
 
     def action_phase(self, player):
@@ -152,5 +151,5 @@ class Game:
                     elif phase == "Action":
                         self.action_phase(player)
             self.round += 1  
-            self.ui.display_ascii_boxes()  # Use default value of 36 boxes
+            self.ui.display_game_board()  # Use default value of 36 boxes
 

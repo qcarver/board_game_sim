@@ -33,7 +33,7 @@ TRADE_PAYOUT_MAP = {    #CCWR:2,        RESOURCE:4,     CCR:2
 class Player:
 
     _id_counter = 0
-    _players = []
+    _players = {}    
 
     @classmethod
     def _generate_id(cls):
@@ -46,8 +46,8 @@ class Player:
         self.cards = []  # Player's card collection
         self.train_cars = [Car(car_type=CAR_TYPE_MAP[trade], proficiency=1)]  # Initial train and car based on trade
         self.resources = Resources()  # Initialize the player's resources to 0
-        players += self
-        self.id = players.length
+        self.id = Player._generate_id() 
+        self.__class__._players[self.id] = self
 
     @classmethod
     def get_player_by_id(cls, player_id):

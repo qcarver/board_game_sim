@@ -17,181 +17,54 @@ class Transaction:
     @details This class handles the exchange of resources and cards between players.
     """
 
-    class TransactionDetails:
+    class Bid:
         """
-        @class TransactionDetails
-        @brief Contains the details of a player's transaction.
-        @details This class holds the resources and cards being offered or received by a player.
+        @class Bid
+        @brief Contains the details of a bid from a player.
+        @details This class holds the player, resources, and cards being offered or received.
         """
-        def __init__(self, player: Player):
+        def __init__(self, player: Player, resources: Resources, cards: list):
             """
-            @brief Initialize the TransactionDetails with the player.
-            @param player The player involved in the transaction.
+            @brief Initialize the Bid with the player, resources, and cards.
+            @param player The player making the bid.
+            @param resources The resources included in the bid.
+            @param cards The cards included in the bid.
             """
             self.player = player
-            self.resources = Resources()
-            self.cards = []
+            self.resources = resources
+            self.cards = cards
 
-        def offer_resources(self, resource_type, quantity):
-            """
-            @brief Offer resources for the transaction.
-            @param resource_type The type of resource being offered.
-            @param quantity The quantity of the resource being offered.
-            """
-            if self.player.resources.components[resource_type] >= quantity:
-                self.resources.components[resource_type] += quantity
-                self.player.resources.components[resource_type] -= quantity
-            else:
-                print(f"Not enough {resource_type.name} to offer.")
-
-        def offer_card(self, card):
-            """
-            @brief Offer a card for the transaction.
-            @param card The card being offered.
-            """
-            if card in self.player.cards:
-                self.cards.append(card)
-                self.player.cards.remove(card)
-            else:
-                print(f"{self.player.name} does not have the card {card.name}.")
-
-    def __init__(self, offering_player: Player, receiving_player: Player):
+    def __init__(self, offering_bid: 'Transaction.Bid', receiving_bid: 'Transaction.Bid'):
         """
-        @brief Initialize the Transaction with the offering and receiving players.
-        @param offering_player The player offering resources or cards.
-        @param receiving_player The player receiving resources or cards.
+        @brief Initialize the Transaction with the offering and receiving bids.
+        @param offering_bid The bid from the offering player.
+        @param receiving_bid The bid from the receiving player.
         """
-        self.offering_details = self.TransactionDetails(offering_player)
-        self.receiving_details = self.TransactionDetails(receiving_player)
+        self.offering_bid = offering_bid
+        self.receiving_bid = receiving_bid
 
     def accept(self):
         """
         @brief Accept the transaction and transfer resources and cards.
         """
         # Transfer resources from offering player to receiving player
-        for resource_type, quantity in self.offering_details.resources.components.items():
-            self.receiving_details.player.resources.components[resource_type] += quantity
+        for resource_type, quantity in self.offering_bid.resources.components.items():
+            self.receiving_bid.player.resources.components[resource_type] += quantity
+            self.offering_bid.player.resources.components[resource_type] -= quantity
 
         # Transfer cards from offering player to receiving player
-        for card in self.offering_details.cards:
-            self.receiving_details.player.cards.append(card)
+        for card in self.offering_bid.cards:
+            self.receiving_bid.player.cards.append(card)
+            self.offering_bid.player.cards.remove(card)
 
         # Transfer resources from receiving player to offering player
-        for resource_type, quantity in self.receiving_details.resources.components.items():
-            self.offering_details.player.resources.components[resource_type] += quantity
+        for resource_type, quantity in self.receiving_bid.resources.components.items():
+            self.offering_bid.player.resources.components[resource_type] += quantity
+            self.receiving_bid.player.resources.components[resource_type] -= quantity
 
         # Transfer cards from receiving player to offering player
-        for card in self.receiving_details.cards:
-            self.offering_details.player.cards.append(card)
+        for card in self.receiving_bid.cards:
+            self.offering_bid.player.cards.append(card)
+            self.receiving_bid.player.cards.remove(card)
 
-        offerred_items = []
-
-        for resource_type, quantity in self.offering_details.resources.components.items():
-            if quantity > 0:
-                offerred_items.append(f"{quantity} {resource_type.name}")
-
-        for card in self.offering_details.cards:
-            offerred_items.append(f"card {card.name}")
-
-        offerred_items_str = ", ".join(offerred_items)
-
-        received_items = []
-
-        for resource_type, quantity in self.receiving_details.resources.components.items():
-            if quantity > 0:
-                received_items.append(f"{quantity} {resource_type.name}")
-
-        for card in self.receiving_details.cards:
-            received_items.append(f"card {card.name}")
-
-        received_items_str = ", ".join(received_items)
-
-        print(f"Transaction between {self.offering_details.player.name} for {offerred_items_str} "
-              f"and {self.receiving_details.player.name} for {received_items_str} completed.")
-
-    def cancel(self):
-        """
-        @brief Cancel the transaction and return resources and cards to the offering player.
-        """
-        for resource_type, quantity in self.offering_details.resources.components.items():
-            self.offering_details.player.resources.components[resource_type] += quantity
-
-        for card in self.offering_details.cards:
-            self.offering_details.player.cards.append(card)
-
-        for resource_type, quantity in self.receiving_details.resources.components.items():
-            self.receiving_details.player.resources.components[resource_type] += quantity
-
-        for card in self.receiving_details.cards:
-            self.receiving_details.player.cards.append(card)
-
-        print(f"Transaction canceled between {self.offering_details.player.name} and {self.receiving_details.player.name}.")
-
-class TransactionUI:
-    """
-    @class TransactionUI
-    @brief Manages the user interface for transactions.
-    @details This class handles the console-based user interface for transactions between players.
-    """
-    def __init__(self, offering_player, receiving_player):
-        """
-        @brief Initialize the TransactionUI with the names of the offering and receiving players.
-        @param offering_player The object representing the player initiating the transaction. 
-        @param receiving_player_name The object representing the player who is the transactant. 
-        """
-        self.offering_player = offering_player
-        self.receiving_player = receiving_player
-        self.transaction = Transaction(offering_player, receiving_player)
-
-
-
-
-    def prompt(self):
-        """
-        @brief Prompt the user with the current state of the offering and receiving players.
-        """
-        pattern = re.compile(r'^[0-5]:((\d+|[HPFOIE]\d+)(\+(\d+|[HPFOIE]\d+))*)?>[0-5]:((\d+|[HPFOIE]\d+)(\+(\d+|[HPFOIE]\d+))*)?$')
-        
-        while True:
-            user_input = input("Enter your transaction (Eg: {offering_player.id}:1+H1+P2>{receiving_player.id}:F1+I1)")
-            if pattern.match(user_input):
-                break
-            else:
-                print(f"Invalid input format. Try something like (player:card#+resource-quantity...>...): ")
-
-        offering_selection, receiving_selection = user_input.split('>')
-        offering_player_index, offering_items = offering_selection.split(':')
-        receiving_player_index, receiving_items = receiving_selection.split(':')
-        
-        #print(f"Offering player selected index: {offering_player_index} with items: {offering_items}")
-        #print(f"Receiving player selected index: {receiving_player_index} with items: {receiving_items}")
-
-        # Process offering items
-        for item in offering_items.split('+'):
-            if item.isdigit():
-                # Handle card offering
-                card_index = int(item) - 1
-                if 0 <= card_index < len(self.offering_player.cards):
-                    self.transaction.offering_details.offer_card(self.offering_player.cards[card_index])
-            else:
-                # Handle resource offering
-                resource_type = ResourceType.with_initial(item[0])
-                quantity = int(item[1:])
-                self.transaction.offering_details.offer_resources(resource_type, quantity)
-        
-        # Process receiving items
-        for item in receiving_items.split('+'):
-            if item.isdigit():
-                # Handle card offering
-                card_index = int(item) - 1
-                if 0 <= card_index < len(self.receiving_player.cards):
-                    self.transaction.receiving_details.offer_card(self.receiving_player.cards[card_index])
-            else:
-                # Handle resource offering
-                resource_type = ResourceType.with_initial(item[0])
-                quantity = int(item[1:])
-                self.transaction.receiving_details.offer_resources(resource_type, quantity)
-        
-        # Accept the transaction
-        self.transaction.accept()
-        return True
+        print(f"Transaction completed between {self.offering_bid.player.name} and {self.receiving_bid.player.name}.")
