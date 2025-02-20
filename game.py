@@ -5,6 +5,7 @@
 @license: this is a WIP, it is private, not for distribution
 """
 import copy
+import os
 #import pdb #pdb.set_trace() # to pause for debugging
 from player import Player, Trade, TRADE_PAYOUT_MAP
 from train import CarType, Car
@@ -35,26 +36,9 @@ class Game:
             Player("CPU5", Trade.MACHINIST)
         ]
         # Initialize card deck using CSV-style card data
-        self.card_deck = CardDeck([
-            "Stop Train, Everything that goes - stops, 0, 0, 2, 2, 1, 0, PyFxn, PyFxnParam", 
-            "Decrease Speed, Whoah Big Fella!, 0, 0, 1, 0, 1, 0, PyFxn, PyFxnParam", 
-            "Increase Speed, Increases power production, 2, 2, 1, 0, 1, 0, PyFxn, PyFxnParam", 
-            "Heat Shield, Reduces heat damage, 0, 3, 1, 0, 0, 1, PyFxn, PyFxnParam", 
-            "Increase Fe Yield, More efficient Iron Extraction from Ilmenite, 2, 0, 0, 1, 0, 1, PyFxn, PyFxnParam", 
-            "Sheet-Metal Production, Some like it flat, 1, 1, 1, 1, 0, 1, PyFxn, PyFxnParam", 
-            "Steel, The difference between Steel and Iron is a little bit of Carbon and a lot of know how!, 1, 1, 0, 1, 0, 1, PyFxn, PyFxnParam", 
-            "Increase Ti Yield, More efficient Titanium Extraction from Ilmenite, 2, 0, 0, 1, 0, 1, PyFxn, PyFxnParam", 
-            "Blockade, This is our hill.. these are our beans, 1, 0, 1, 0, 1, 0, PyFxn, PyFxnParam", 
-            "Party, Workers Gone Wild,TRADE_PAYOUT_MAP,  0, 0, 0, 2, 1, 1, PyFxn, PyFxnParam", 
-            "Bucket Buster, You can't shovel that, 1, 1, 1, 0, 1, 1, PyFxn, PyFxnParam", 
-            "Solar Flare, Increases power production, 3, 0, 1, 0, 0, 1, PyFxn, PyFxnParam", 
-            "Geothermal Vulcanism, Increases heat production, 3, 0, 1, 0, 0, 1, PyFxn, PyFxnParam", 
-            "Rubble, Soil so loose you can pick it up with your bare hands.. well almost, 0, 1, 1, 0, 0, 1, PyFxn, PyFxnParam", 
-            "Rocky Road, it's not just ice cream, 1, 0, 1, 0, 1, 0, PyFxn, PyFxnParam", 
-            "Boulder, Like a rock but much bigger, 1, 1, 1, 0, 1, 1, PyFxn, PyFxnParam", 
-            "Civil Service Day, Usually we aren't very civil, 0, 0, 0, 3, 0, 2, PyFxn, PyFxnParam", 
-            "Rail Damage, Railways on Mercury, 0, 1, 0, 1, 0, 1, PyFxn, PyFxnParam"
-        ])
+        current_dir = os.path.dirname(__file__)
+        cards_path = os.path.join(current_dir, "card_deck.csv")
+        self.card_deck = CardDeck(cards_path)
     
     def draw_card(self, player):
         response = self.ui.prompt_input(f"{player.name} (draw card)? [Y]: ") or "Y"

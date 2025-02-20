@@ -7,6 +7,7 @@ import random
 from resources import Resources, power, heat, freedom, order, imports, exports
 
 class Card:
+
     def __init__(self, name, text, cost: Resources):
         self.name = name  # Name of the card
         self.text = text  # Description of the card's effect
@@ -39,17 +40,30 @@ class Card:
     #    )
 
 class CardDeck:
-    def __init__(self, card_data: list[str]):
-        """Initialize the CardDeck with card data from a CSV array."""
+    def __init__(self, csv_file_path: str):
+        """Initialize the CardDeck with card data from a CSV file."""
         self.deck = []
-        for line in card_data:
-            parts = line.split(', ')
-            name = parts[0]
-            text = parts[1]
-            cost = (power * int(parts[2]) + heat * int(parts[3]) + 
-                   freedom * int(parts[4]) + order * int(parts[5]) + 
-                   imports * int(parts[6]) + exports * int(parts[7]))
-            self.deck.append(Card(name, text, cost))
+        with open(csv_file_path, 'r') as file:
+            for line_number, line in enumerate(file, start=1):
+                parts = line.strip().split(', ')
+                try:
+                    # The header line won't have integers on it, skip.
+                    for part in parts[2:8]:
+                        int(part)
+                except ValueError:
+                    # Skip the line if any of the parameters are not integers
+                    continue
+                try:
+                    name = parts[0]
+                    text = parts[1]
+                    cost = (power * int(parts[2]) + heat * int(parts[3]) + 
+                           freedom * int(parts[4]) + order * int(parts[5]) + 
+                           imports * int(parts[6]) + exports * int(parts[7]))
+                    self.deck.append(Card(name, text, cost))
+                except IndexError:
+                    # it's not the header line and it doesn't fit the data pattern
+                    print(f"Error processing line {line_number}: {line.strip()}")
+                    raise
         random.shuffle(self.deck)
 
     def draw_card(self) -> Card:
