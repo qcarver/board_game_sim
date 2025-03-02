@@ -1,0 +1,174 @@
+{
+  "Gossamer": {
+    "Dimensions": {
+      "Width": "8 meters (including overhang, ~26 feet)",
+      "Height": "As tall as a 4-story apartment building (4 decks)",
+      "Track Configuration": {
+        "Port Side Track": "One complete railroad track under port side",
+        "Starboard Side Track": "One complete railroad track under starboard side",
+        "Track Separation": "3 meters (~10 feet)",
+        "Total Width Between Outer Tracks": "6 meters (~20 feet)"
+      }
+    },
+    "Color": "Yellow (for high visibility)",
+    "Asymmetry": {
+      "Port Side": {
+        "Exposure": "In shadow",
+        "Windows": "Few or none"
+      },
+      "Starboard Side": {
+        "Exposure": "In light",
+        "Windows": "East and South-facing at sharp angles"
+      }
+    },
+    "Train": {
+      "Tractor": {
+        "Function": "Engine, Earthmoving, and Track-Laying System",
+        "ConductorCompartment": {
+          "Location": "Fourth floor, port side",
+          "Width": "2 meters",
+          "Description": "Protrudes over the starboard-side railroad track, serving as the cockpit."
+        },
+        "Track-Laying System": {
+          "Iron Rails": "Forged in real-time from iron processed earlier in the train.",
+          "Basalt Ties": "Extruded and laid down simultaneously with the iron rails.",
+          "Movement": "Continuous, slow forward motion (unlike SLJ-932's hopping)."
+        },
+        "Earthmoving System": {
+          "Centralized": "Front-mounted tillers, plows, and excavator wheel prepare the ground."
+        },
+        "Decks": {
+          "Deck": [
+            {
+              "Number": 1,
+              "Deck 1": "Earthmoving controls, hydraulic systems, on-shift quarters",
+              "Description": "Engineering Deck"
+            },
+            {
+              "Number": 2,
+              "Deck 2": "Power systems and raw material storage, crew quarters, office lounge",
+              "Description": "Engineering Deck"
+            },
+            {
+              "Number": 3,
+              "Deck 3": "Track-laying system and cooling mechanisms.",
+              "Description": "Engineering Deck"
+            },
+            {
+              "Number": 4,
+              "Deck 4": "Operator cabin, control systems, small quarters, egress point, locker rooms, parts storage",
+              "Description": "Crew Deck"
+            }
+          ]
+        }
+      },
+      "Cars": {
+        "Car": [
+          {
+            "Number": 1,
+            "Function": "Regolith Pulverizing and Sorting",
+            "Deck": [
+              {
+                "Number": 1,
+                "Function": "Magnetic capture system and conveyer handling"
+              },
+              {
+                "Number": 2,
+                "Function": "Pulverizer for ilmenite regolith"
+              },
+              {
+                "Number": 3,
+                "Function": "Temporary regolith storage"
+              },
+              {
+                "Number": 4,
+                "Function": "Waste disposal chute, system controls, small quarters"
+              }
+            ]
+          },
+          {
+            "Number": 2,
+            "Function": "Becher Process Reduction",
+            "Deck": [
+              {
+                "Number": 1,
+                "Function": "Rotary kiln for Becher process and H/CO handling"
+              },
+              {
+                "Number": 2,
+                "Function": "Magnetic recovery system for metallic iron"
+              },
+              {
+                "Number": 3,
+                "Function": "Output routing to Car 3 for Ti and Car 4 for Fe"
+              },
+              {
+                "Number": 4,
+                "Function": "Byproduct handling, gas recycling systems, apartments"
+              }
+            ]
+          },
+          {
+            "Number": 3,
+            "Function": "Kroll Process, Water Recycling, and Heat Management",
+            "Deck": [
+              {
+                "Number": 1,
+                "Function": "Salt-water bath for Titanium Dioxide electrolysis"
+              },
+              {
+                "Number": 2,
+                "Function": "Melting and casting of Ti and Fe ingots"
+              },
+              {
+                "Number": 3,
+                "Function": {
+                  "Grey Water Treatment": "Reverse osmosis and UV sterilization",
+                  "Brown Water Treatment": "Settling tanks and anaerobic digesters",
+                  "Mess Hall": "open area between tanks and digesters, with mezzanine"
+                }
+              },
+              {
+                "Number": 4,
+                "Function": {
+                  "Mushroom Farm": "Converts organic material into food and compost",
+                  "Brine Shrimp Farm": "",
+                  "Black Soldier Fly Larvae Farm": "",
+                  "Algae Farm": "",
+                  "Mess Hall": "open area between tanks and digesters"
+                }
+              }
+            ]
+          },
+          {
+            "Number": 4,
+            "Function": "Forging, Storage, Crew Quarters",
+            "Deck": [
+              {
+                "Number": 1,
+                "Function": "Ingot Forge"
+              },
+              {
+                "Number": 2,
+                "Function": "Storage"
+              },
+              {
+                "Number": 3,
+                "Function": {   "Crew quarters, living spaces" : "",
+                                "Recreational areas and administrative offices." : ""
+                }
+              },
+              {
+                "Number": 4,
+                "Function": { "Crew quarters, living spaces" : "",
+                                "Recreational areas and administrative offices" : ""
+              }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
+
