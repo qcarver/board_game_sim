@@ -5,9 +5,8 @@
 @version 0.1
 """
 
-from resources import ResourceType, Resources
+from resources import Resources
 from player import Player
-import re
 import pdb #pdb.set_trace() # to pause for debugging
 
 class Transaction:

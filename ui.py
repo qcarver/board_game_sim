@@ -100,40 +100,41 @@ class ConsoleUI(GameUI):
 
         # Create Transaction.Bid objects
         offering_player = Player.get_player_by_id(int(offering_player_id))
-        offering_bid = Transaction.Bid(offering_player, Resources(), [])
+        offering_bid = self.create_bid(offering_player, offering_items)
         receiving_player = Player.get_player_by_id(int(receiving_player_id))  
-        receiving_bid = Transaction.Bid(receiving_player, Resources(), [])
+        receiving_bid = self.create_bid(receiving_player, receiving_items)
 
-        # Process offering items
-        for item in offering_items.split('+'):
-            if item.isdigit():
-                # Handle card offering
-                card_index = int(item) - 1
-                if 0 <= card_index < len(offering_player.cards):
-                    offering_bid.cards.append(offering_player.cards[card_index])
-            else:
-                # Handle resource offering
-                resource_type = ResourceType.with_initial(item[0])
-                quantity = int(item[1:])
-                offering_bid.resources += resource_type * quantity   #.add(resource_type, quantity)
-        
-        # Process receiving items
-        for item in receiving_items.split('+'):
-            if item.isdigit():
-                # Handle card offering
-                card_index = int(item) - 1
-                if 0 <= card_index < len(receiving_player.cards):
-                    receiving_bid.cards.append(receiving_player.cards[card_index])
-            else:
-                # Handle resource offering
-                resource_type = ResourceType.with_initial(item[0])
-                quantity = int(item[1:])
-                receiving_bid.resources += resource_type * quantity      #.add(resource_type, quantity)
-        
         transaction = Transaction(offering_bid, receiving_bid)
 
-        #Note the transaction is not yet accepted, it is just created
+        # Note the transaction is not yet accepted, it is just created
         return transaction
+
+    def create_bid(self, player: Player, items: str) -> Transaction.Bid:
+        """
+        Create a Transaction.Bid object from the player and items string.
+        
+        Args:
+            player (Player): The player making the bid.
+            items (str): The items string (e.g., "1+H1+P2").
+        
+        Returns:
+            Transaction.Bid: The created bid object.
+        """
+        bid = Transaction.Bid(player, Resources(), [])
+        
+        for item in items.split('+'):
+            if item.isdigit():
+                # Handle card offering
+                card_index = int(item) - 1
+                if 0 <= card_index < len(player.cards):
+                    bid.cards.append(player.cards[card_index])
+            else:
+                # Handle resource offering
+                resource_type = ResourceType.with_initial(item[0])
+                quantity = int(item[1:])
+                bid.resources += resource_type * quantity   #.add(resource_type, quantity)
+        
+        return bid
 
     def display_game_board(self, num_boxes: int = 36) -> None:
         if num_boxes < 1:
