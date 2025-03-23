@@ -44,7 +44,7 @@ class Player:
         self.name = name
         self.trade = trade  # Enumerator for the player's trade
         self.cards = []  # Player's card collection
-        self.train_cars = [Car(car_type=CAR_TYPE_MAP[trade], proficiency=1)]  # Initial train and car based on trade
+        self.train_cars = [Car(car_type=CAR_TYPE_MAP[trade], speed=1)]  # Initial train and car based on trade
         self.resources = Resources()  # Initialize the player's resources to 0
         self.id = Player._generate_id() 
         self.__class__._players[self.id] = self

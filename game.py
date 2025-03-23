@@ -58,7 +58,7 @@ class Game:
     def calculate_payout(self, player):
         resources_before_payout = copy.deepcopy(player.resources)
         for car in player.train_cars:
-            player.resources += (TRADE_PAYOUT_MAP[car.car_type] * car.proficiency)
+            player.resources += (TRADE_PAYOUT_MAP[car.car_type] * car.speed)
 
         self.ui.display_message(f"   {resources_before_payout}")
         self.ui.display_message(f" + {player.resources - resources_before_payout}")

@@ -13,6 +13,6 @@ class CarType(Enum):
     TRACKLAYER = 5
 
 class Car:
-    def __init__(self, car_type : CarType, proficiency: int = 1):
+    def __init__(self, car_type : CarType, speed: int = 1):
         self.car_type = car_type  # Enumerator for the car's type
-        self.proficiency = proficiency  # Proficiency level between 1 and 3
+        self.speed = speed  # speed between 1 and 5
