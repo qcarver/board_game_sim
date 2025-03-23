@@ -82,58 +82,54 @@ class ConsoleUI(GameUI):
 
     def prompt_transaction_input(self) -> Transaction:
         """
-        @brief Prompt the user with the current state of the offering and receiving players.
+        Prompt the user with the current state of the offering and receiving players.
+        """
+        user_input = self._get_valid_transaction_input()
+        offering_selection, receiving_selection = self._split_transaction_input(user_input)
+        offering_bid = self._create_bid_from_selection(offering_selection)
+        receiving_bid = self._create_bid_from_selection(receiving_selection)
+        return Transaction(offering_bid, receiving_bid)
+
+    def _get_valid_transaction_input(self) -> str:
+        """
+        Prompt the user for a valid transaction input and validate it against the pattern.
         """
         pattern = re.compile(r'^[0-5]:((\d+|[HPFOIE]\d+)(\+(\d+|[HPFOIE]\d+))*)?>[0-5]:((\d+|[HPFOIE]\d+)(\+(\d+|[HPFOIE]\d+))*)?$')
-        
         while True:
-            user_input = input("Enter your transaction (Eg: *your_id#*:1+H1+P2>*others_id#*:F1+I1)")
+            user_input = input("Enter your transaction (Eg: *your_id#*:1+H1+P2>*others_id#*:F1+I1): ")
             if pattern.match(user_input):
-                break
+                return user_input
             else:
-                print(f"Invalid input format. Try something like (player:card#+resource-quantity...>...): ")
+                print("Invalid input format. Try something like (player:card#+resource-quantity...>...): ")
 
-        # Parse the input
+    def _split_transaction_input(self, user_input: str) -> tuple:
+        """
+        Split the transaction input into offering and receiving selections.
+        """
         offering_selection, receiving_selection = user_input.split('>')
-        offering_player_id, offering_items = offering_selection.split(':')
-        receiving_player_id, receiving_items = receiving_selection.split(':')
+        return offering_selection, receiving_selection
 
-        # Create Transaction.Bid objects
-        offering_player = Player.get_player_by_id(int(offering_player_id))
-        offering_bid = Transaction.Bid(offering_player, Resources(), [])
-        receiving_player = Player.get_player_by_id(int(receiving_player_id))  
-        receiving_bid = Transaction.Bid(receiving_player, Resources(), [])
+    def _create_bid_from_selection(self, selection: str) -> Transaction.Bid:
+        """
+        Create a Transaction.Bid object from a selection string.
+        """
+        player_id, items = selection.split(':')
+        player = Player.get_player_by_id(int(player_id))
+        bid = Transaction.Bid(player, Resources(), [])
 
-        # Process offering items
-        for item in offering_items.split('+'):
+        for item in items.split('+'):
             if item.isdigit():
                 # Handle card offering
                 card_index = int(item) - 1
-                if 0 <= card_index < len(offering_player.cards):
-                    offering_bid.cards.append(offering_player.cards[card_index])
+                if 0 <= card_index < len(player.cards):
+                    bid.cards.append(player.cards[card_index])
             else:
                 # Handle resource offering
                 resource_type = ResourceType.with_initial(item[0])
                 quantity = int(item[1:])
-                offering_bid.resources += resource_type * quantity   #.add(resource_type, quantity)
-        
-        # Process receiving items
-        for item in receiving_items.split('+'):
-            if item.isdigit():
-                # Handle card offering
-                card_index = int(item) - 1
-                if 0 <= card_index < len(receiving_player.cards):
-                    receiving_bid.cards.append(receiving_player.cards[card_index])
-            else:
-                # Handle resource offering
-                resource_type = ResourceType.with_initial(item[0])
-                quantity = int(item[1:])
-                receiving_bid.resources += resource_type * quantity      #.add(resource_type, quantity)
-        
-        transaction = Transaction(offering_bid, receiving_bid)
+                bid.resources += resource_type * quantity
 
-        #Note the transaction is not yet accepted, it is just created
-        return transaction
+        return bid
 
     def display_game_board(self, num_boxes: int = 36) -> None:
         if num_boxes < 1:

@@ -68,5 +68,25 @@ class CardDeck:
 
     def draw_card(self) -> Card:
         return self.deck.pop() if self.deck else None
+    
+def play_card(card: Card, game_state) -> bool:
+    """
+    @brief This function plays the card selected by the player
+    @param card: The card to be played
+    @param game_state: The current state of the game
+    @return: A boolean value to indicate if the card was played successfully
+    """
+    # Check if the player has enough resources to play the card
+    if not game_state.has_enough_resources(card.cost):
+        return False
+    
+    # Apply the card's effect to the game state
+    card.apply_effect(game_state)
+    
+    # Deduct the resources used to play the card from the player's resources
+    game_state.deduct_resources(card.cost)
+    
+    return True
+
 
 
