@@ -12,6 +12,7 @@ Resources object.
 import operator
 from enum import Enum
 
+
 # Define the color_map dictionary outside the class
 color_map = {
     "POWER": ("DARK_YELLOW", "\033[33m", 1),
@@ -89,14 +90,20 @@ RESET = "\033[0m"
 @details +, -, *, +=,are overloaded to make finances more ituative 
 """
 class Resources:
-    def __init__(self, *args):
-        # Initialize all resource counts to 0
+    def __init__(self):
         self.components = {resource: 0 for resource in ResourceType}
-        
-        # Update the resources with the provided arguments
-        for quantity, resource in args:
-            if resource in self.components:
-                self.components[resource] += quantity
+
+    def __init__(self, *args, **kwargs):
+        self.components = {resource: 0 for resource in ResourceType}
+        if len(args) == 1 and isinstance(args[0], dict):
+            # Handle dictionary input
+            self.components = args[0]
+        elif all(isinstance(arg, tuple) and len(arg) == 2 for arg in args):
+            # Handle tuple input
+            for quantity, resource in args:
+                self.components[resource] = quantity
+        else:
+            raise ValueError("Invalid arguments for Resources initialization")
     
     def __add__(self, other):
         if isinstance(other, Resources):
@@ -128,7 +135,6 @@ class Resources:
         return self.__mul__(quantity)    
     
     def __iadd__(self, other):
-        #pdb.set_trace()
         if isinstance(other, Resources):
             for resource in ResourceType:
                 self.components[resource] += other.components[resource]
